@@ -118,7 +118,7 @@ PAGE = """
 
   <h2><span>03</span>Reboot test</h2>
   <div class="card">
-    <p style="margin:0">FILL IN AFTER THE TEST</p>
+    <p style="margin:0">Rebooted the virtual machine on 2 Nov 2026. Before the reboot the counter showed 5, and after the reboot the page opened automatically and the counter continued from 6. Nginx, MariaDB and the Python app all started on their own, and the value was kept in the database.</p>
   </div>
 
   <h2><span>04</span>Source code</h2>
