@@ -57,7 +57,7 @@ cat > "$TEMP_FILE" <<EOF
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Week 3 – Server Status Report</title>
   <style>
-    body { font-family: "Courier New", Consolas, monospace; max-width: 900px; margin: 40px auto;
+    body { font-family: Consolas, "DejaVu Sans Mono", monospace; font-size: 17px; max-width: 900px; margin: 40px auto;
            padding: 0 20px; line-height: 1.6; background: #0d1117; color: #c9d1d9; }
     h1 { color: #39ff14; }
     h1::before { content: "guest@server:~$ "; color: #58a6ff; }
@@ -153,9 +153,10 @@ cat > "$TEMP_FILE" <<EOF
     <h2>Test results</h2>
  
     <h3>Syntax check and manual execution</h3>
-    <p>TODO: <code>bash -n report.sh</code> printed nothing, which means no syntax
-       errors. Running <code>./report.sh</code> manually created the page and it
-       opened correctly in the browser.</p>
+    <p><code>bash -n report.sh</code> printed nothing, which means there were no
+       syntax errors. <code>wc -l</code> confirmed that the whole file was copied to
+       the server. Running <code>./report.sh</code> manually created
+       <code>index.html</code> and the page opened correctly in the browser.</p>
  
     <h3>Disk space status tests</h3>
     <p>I ran <code>./report.sh --test</code>, which passes the values 50, 80 and 90
@@ -175,19 +176,50 @@ cat > "$TEMP_FILE" <<EOF
     </div>
  
     <h3>Automatic updates</h3>
-    <p>TODO: Generation times of two consecutive automatic updates:
-       2026-11-XX XX:XX:00 and 2026-11-XX XX:XX:00.</p>
+    <p>I read the generation time from the file twice, about one minute apart:</p>
+    <pre>grep "Report generated" /var/www/html/viikko3/index.html</pre>
+    <ul>
+      <li>1st automatic update: <strong>2026-11-10 16:02:01 EET</strong></li>
+      <li>2nd automatic update: <strong>2026-11-10 16:03:01 EET</strong></li>
+    </ul>
+    <p>The time changed by exactly one minute, so cron runs the script as planned.</p>
  
     <h3>Reboot test</h3>
-    <p>TODO: I rebooted the VM with <code>sudo reboot</code> on 2026-11-XX at XX:XX.
-       Afterwards the Week 2 application and this page opened normally, and the
-       generation time kept changing every minute. The "booted" time in the table
-       above shows the latest boot.</p>
+    <p>I rebooted the VM with <code>sudo reboot</code> on 2026-11-10 at about 16:04 EET.
+       After logging back in I checked the situation:</p>
+    <pre>&#36; uptime -s
+2026-11-10 16:04:42
+ 
+&#36; systemctl is-active nginx mariadb viikko2 cron
+active
+active
+active
+active
+ 
+&#36; grep "Report generated" /var/www/html/viikko3/index.html
+... 2026-11-10 16:07:01 EET (UTC+02:00) ...</pre>
+    <p>The new boot time shows that the reboot happened. Nginx, MariaDB, my Week 2
+       application and cron all started automatically. The report was generated
+       again after the reboot (16:07:01), so the schedule continued without any
+       manual action. Both <code>/viikko2/</code> and <code>/viikko3/</code> opened
+       normally in the browser.</p>
   </section>
  
   <section>
     <h2>A problem solved or a lesson learned</h2>
-    <p>TODO: e.g. the mktemp permission problem (see instructions).</p>
+    <p><strong>Problem:</strong> My first command for reading the generation time,
+       <code>grep -o "[0-9-]* [0-9:]* UTC" index.html</code>, suddenly printed nothing.
+       The reason was that I had changed the server's time zone with
+       <code>sudo timedatectl set-timezone Europe/Helsinki</code>, so the page no longer
+       said <code>UTC</code> but <code>EET</code>. I solved it by checking the time zone
+       with <code>date</code> and using a simpler search, <code>grep "Report generated"</code>,
+       which works in any time zone.</p>
+    <p><strong>Lesson learned:</strong> To push to GitHub from the server I used a
+       <em>deploy key</em>, an SSH key that only has access to this one repository
+       instead of my whole GitHub account. Only the public key was added to GitHub;
+       the private key stays on the server and is never published. I also checked that
+       the host fingerprint shown by <code>ssh -T git@github.com</code> matched
+       GitHub's official fingerprint before answering <code>yes</code>.</p>
   </section>
  
   <footer>
