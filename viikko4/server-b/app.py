@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 SERVER_A_COUNTER = "http://195.148.21.16/viikko2/"
 SERVER_B_COUNTER = "http://128.214.255.114/viikko4/"
-GITHUB_URL = "https://github.com/coffeeMusic83/Linux-Administration"
+GITHUB_URL = "https://github.com/coffeeMusic83/Linux-Administration/tree/main/viikko4"
 
 
 def get_connection():
