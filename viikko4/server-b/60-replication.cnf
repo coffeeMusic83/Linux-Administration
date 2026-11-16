@@ -1,0 +1,8 @@
+[mysqld]
+server-id       = 2
+relay_log       = /var/log/mysql/relay-bin
+replicate_do_db = viikko2
+read_only       = 1
+
+
+
